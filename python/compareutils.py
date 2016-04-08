@@ -988,7 +988,7 @@ def run_igscueal(args, label, n_leaves, mut_mult, seqfname):
     cfgfname = workdir + '/cfg.bf'
     sed_cmd += ' ' + template_cfgfname + ' >' + cfgfname
     check_call(sed_cmd, shell=True)
-
+    
     # cmd = 'salloc -N 3 mpirun -np 3 /home/dralph/work/hyphy/hyphy-master/HYPHYMPI ' + cfgfname
     # srun --mpi=openmpi
     cmd = 'srun --exclude=data/gizmod.txt mpirun -np 2 /home/dralph/work/hyphy/hyphy-master/HYPHYMPI ' + cfgfname
@@ -1024,7 +1024,7 @@ def run_igscueal(args, label, n_leaves, mut_mult, seqfname):
         check_call('sed -n \'' + str(istart) + ',' + str(istop) + ' p\' ' + infname + '>' + subinfname, shell=True)
 
         print '     starting %d' % iproc
-        procs.append(Popen(cmd.replace(workdir, workdirs[-1]).split(), stdout=PIPE, stderr=PIPE))
+    #    procs.append(Popen(cmd.replace(workdir, workdirs[-1]).split(), stdout=PIPE, stderr=PIPE))
         # procs.append(Popen(['sleep', '10']))
 
     while procs.count(None) < len(procs):

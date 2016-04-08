@@ -1858,7 +1858,9 @@ def print_heapy(extrastr, heap):
 def auto_slurm(n_procs):
     """ Return true if we want to force slurm usage, e.g. if there's more processes than cores """
     try:
-        check_output(['which', 'srun'])
+        ## To get rid of the error message when you don't have slurm
+        with open(os.devnull, 'w') as devnull:
+            check_output(['which', 'srun'], stderr=devnull)
         slurm_exists = True
     except CalledProcessError:
         slurm_exists = False

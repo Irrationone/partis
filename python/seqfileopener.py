@@ -78,6 +78,9 @@ def get_seqfile_info(fname, is_data, glfo=None, n_max_queries=-1, queries=None, 
             translate_columns(line, {name_column : internal_name_column, seq_column: internal_seq_column})
         utils.process_input_line(line)
         unique_id = line[internal_name_column]
+
+        ## Actually deal with colons properly since they come up VERY OFTEN in sequence IDs
+        unique_id = unique_id.replace(":", "_")
         if any(fc in unique_id for fc in utils.forbidden_characters):
             raise Exception('found a forbidden character (one of %s) in sequence id \'%s\' -- sorry, you\'ll have to replace it with something else' % (' '.join(["'" + fc + "'" for fc in utils.forbidden_characters]), unique_id))
 
