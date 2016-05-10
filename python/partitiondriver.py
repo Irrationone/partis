@@ -284,7 +284,10 @@ class PartitionDriver(object):
             clusterfname = self.args.workdir + '/vsearch-clusters.txt'
             cmd = './bin/vsearch-1.1.3-linux-x86_64 --threads ' + str(self.args.n_procs) + ' --uc ' + clusterfname + ' --cluster_fast ' + fastafname + ' --id ' + str(id_fraction) + ' --maxaccept 0 --maxreject 0'
             if self.args.slurm or utils.auto_slurm(self.args.n_procs):
-                cmd = 'srun --cpus-per-task ' + str(self.args.n_procs) + ' ' + cmd
+                clust_err_file = self.args.error_prefix + "partition_vsearch.err"
+                clust_out_file = self.args.error_prefix + "partition_vsearch.out"
+                clust_string = "-e " + clust_err_file + " -o " + clust_out_file
+                cmd = 'qsub -sync y -b y -V ' + clust_string + ' ' + cmd
             proc = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
             out, err = proc.communicate()
             exit_code = proc.wait()
@@ -391,7 +394,10 @@ class PartitionDriver(object):
         """ Return the appropriate bcrham command string """
         cmd_str = os.getenv('PWD') + '/packages/ham/bcrham'
         if self.args.slurm or utils.auto_slurm(n_procs):
-            cmd_str = 'srun ' + cmd_str
+            clust_err_file = self.args.error_prefix + "_partition_hmm.err"
+            clust_out_file = self.args.error_prefix + "_partition_hmm.out"
+            clust_string = "-e " + clust_err_file + " -o " + clust_out_file
+            cmd_str = 'qsub -sync y -b y -V ' + clust_string + ' -l h_vmem=24G,mem_token=24G,mem_free=24G ' + cmd_str
         cmd_str += ' --algorithm ' + algorithm
         if self.args.n_best_events is not None:
             cmd_str += ' --n_best_events ' + str(int(self.args.n_best_events))

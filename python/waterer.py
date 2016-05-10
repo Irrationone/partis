@@ -224,7 +224,10 @@ class Waterer(object):
         # match score larger than (negative) mismatch score: we want to *encourage* some level of shm. If they're equal, we tend to end up with short unmutated alignments, which screws everything up
         cmd_str = self.args.ighutil_dir + '/bin/vdjalign align-fastq -q'
         if self.args.slurm or utils.auto_slurm(n_procs):
-            cmd_str = 'srun ' + cmd_str
+            clust_err_file = self.args.error_prefix + "vdjalign.err"
+            clust_out_file = self.args.error_prefix + "vdjalign.out"
+            clust_string = "-e " + clust_err_file + " -o " + clust_out_file
+            cmd_str = 'qsub -sync y -b y -V ' + clust_string + ' -l h_vmem=6G,mem_token=6G,mem_free=6G ' + cmd_str
         cmd_str += ' --max-drop 50'
         match, mismatch = self.args.match_mismatch
         cmd_str += ' --match ' + str(match) + ' --mismatch ' + str(mismatch)
