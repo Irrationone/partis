@@ -6,3 +6,7 @@ It is built on top of the [ham](https://github.com/psathyrella/ham) HMM compiler
 The manual is available [here](https://github.com/psathyrella/partis/blob/master/manual.md).
 
 Partis is free software under the GPL v3.
+
+
+
+This fork of `partis` has been modified to work with `sge` instead of `slurm`. 
