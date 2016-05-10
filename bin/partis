@@ -220,6 +220,7 @@ parent_parser.add_argument('--print-git-commit', action='store_true', help='prin
 parent_parser.add_argument('--smc-particles', type=int, default=1, help='DEPRECATED Number of particles (clustering paths) to simulate with SMC')
 parent_parser.add_argument('--min-observations-to-write', type=int, default=20, help='For hmmwriter.py, if we see a gene version fewer times than this, we sum over other alleles, or other versions, etc. (see hmmwriter)')
 # parent_parser.add_argument('--use_mean_at_boundaries', action='store_true', help='see note in hmmwriter')
+parent_parser.add_argument('--error-prefix', help='Allen Zhang: Error file prefix for qsub')
 
 subconfig = {
     'cache-parameters' : {'func' : run_partitiondriver, 'help' : 'Cache parameter values and write hmm model files.'},
