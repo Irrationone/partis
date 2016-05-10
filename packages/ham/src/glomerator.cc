@@ -206,12 +206,18 @@ void Glomerator::WriteCachedLogProbs() {
 
 // ----------------------------------------------------------------------------------------
 void Glomerator::WritePartitions(vector<ClusterPath> &paths) {
+  cout << "        writing partitions" << endl;
   ofs_.open(args_->outfile());
   ofs_ << setprecision(20);
   ofs_ << "partition,logprob" << endl;
   int ipath(0);
   for(auto &cp : paths) {
-    for(unsigned ipart=0; ipart<cp.partitions().size(); ++ipart) {
+    unsigned istart(0);
+    if((int)cp.partitions().size() > args_->n_partitions_to_write())
+      istart = cp.partitions().size() - args_->n_partitions_to_write();
+    for(unsigned ipart=istart; ipart<cp.partitions().size(); ++ipart) {
+      if(args_->write_logprob_for_each_partition())  // only want to calculate this the last time through, i.e. when we're only one process
+	cp.set_logprob(ipart, LogProbOfPartition(cp.partitions()[ipart]));
       int ic(0);
       for(auto &cluster : cp.partitions()[ipart]) {
 	if(ic > 0)
@@ -248,8 +254,7 @@ void Glomerator::WriteAnnotations(vector<ClusterPath> &paths) {
       cout << "WTF " << cluster << " x" << event.naive_seq_ << "x" << endl;
       assert(0);
     }
-    vector<RecoEvent> event_list({event});
-    StreamOutput(annotation_ofs, "viterbi", 1, event_list, seq_info_[cluster], 0., "");
+    StreamViterbiOutput(annotation_ofs, event, seq_info_[cluster], "");
   }
   annotation_ofs.close();
 }
@@ -682,10 +687,10 @@ string Glomerator::CalculateNaiveSeq(string queries, RecoEvent *event) {
     errors_[queries] = errors_[queries] + ":boundary";
 
   if(event != nullptr)
-    *event = result.events_.at(0);
+    *event = result.best_event();
 
   WriteStatus();
-  return result.events_.at(0).naive_seq_;
+  return result.best_event().naive_seq_;
 }
 
 // ----------------------------------------------------------------------------------------

@@ -12,7 +12,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import sys
-sys.path.insert(1, './python')
+current_script_dir = os.path.dirname(os.path.realpath(__file__)).replace('/bin', '/python')
+if not os.path.exists(current_script_dir):
+    print 'WARNING current script dir %s doesn\'t exist, so python path may not be correctly set' % current_script_dir
+sys.path.insert(1, current_script_dir)
 
 import utils
 from humans import humans, colors, all_subdirs
@@ -20,7 +23,7 @@ from humans import humans, colors, all_subdirs
 sns.set_style("ticks")
 parser = argparse.ArgumentParser()
 parser.add_argument('--subdirs', default='v_3p_del:d_5p_del:d_3p_del:j_5p_del:vd_insertion:dj_insertion', help='Which variable categories?')
-parser.add_argument('--dataset', choices=('adaptive', 'stanford', 'both'), default='adaptive')
+parser.add_argument('--dataset', choices=('adaptive', 'vollmers', 'both'), default='adaptive')
 args = parser.parse_args()
 if args.subdirs == 'all':
     args.subdirs = all_subdirs

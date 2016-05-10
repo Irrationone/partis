@@ -5,11 +5,16 @@ import os
 import sys
 import argparse
 import multiprocessing
-sys.path.insert(1, './python')
+current_script_dir = os.path.dirname(os.path.realpath(__file__)).replace('/bin', '/python')
+if not os.path.exists(current_script_dir):
+    print 'WARNING current script dir %s doesn\'t exist, so python path may not be correctly set' % current_script_dir
+sys.path.insert(1, current_script_dir)
+
 import utils
 
 # ----------------------------------------------------------------------------------------
 def run_command(cmd_str):
+    cmd_str += ' --print-git-commit'
     print 'RUN', cmd + cmd_str
     sys.stdout.flush()
     check_call([cmd,] + cmd_str.split())
@@ -32,7 +37,7 @@ parser.add_argument('--plotdir')
 
 all_actions = ('cache-data-parameters', 'simulate', 'cache-simu-parameters', 'plot-performance', 'partition', 'run-viterbi')
 default_actions = all_actions[ : -2]
-parser.add_argument('--actions', default=':'.join(default_actions), choices=all_actions, help='Colon-separated list of actions to perform')
+parser.add_argument('actions', default=':'.join(default_actions), choices=all_actions, help='Colon-separated list of actions to perform')
 # parser.add_argument('--n-procs', default=str(max(1, multiprocessing.cpu_count() / 2)))
 
 args = parser.parse_args()
@@ -61,7 +66,7 @@ if 'cache-data-parameters' in args.actions:
     if args.datafname is None or not os.path.exists(args.datafname):
         raise Exception('ERROR datafname d.n.e.: ' + str(args.datafname))
     # cache parameters from data
-    cmd_str = ' --action cache-parameters --seqfile ' + args.datafname + common_args
+    cmd_str = ' cache-parameters --seqfile ' + args.datafname + common_args
     # cmd_str += ' --skip-unproductive'
     cmd_str += ' --parameter-dir ' + param_dir + '/data'
     if args.plotdir is not None:
@@ -70,21 +75,21 @@ if 'cache-data-parameters' in args.actions:
 
 if 'simulate' in args.actions:
     # simulate based on data parameters
-    cmd_str = ' --action simulate --outfname ' + args.simfname + common_args
+    cmd_str = ' simulate --outfname ' + args.simfname + common_args
     cmd_str += ' --parameter-dir ' + param_dir + '/data/hmm'
     run_command(cmd_str)
 
 sim_name = os.path.basename(args.simfname).replace('.csv', '')  # 'sim', if simfname is just 'simu.csv'
 if 'cache-simu-parameters' in args.actions:
     # cache parameters from simulation
-    cmd_str = ' --action cache-parameters --seqfile ' + args.simfname + ' --is-simu' + common_args
+    cmd_str = ' cache-parameters --seqfile ' + args.simfname + ' --is-simu' + common_args
     cmd_str += ' --parameter-dir ' + param_dir + '/' + sim_name
     if args.plotdir is not None:
         cmd_str += ' --plotdir ' + args.plotdir + '/' + sim_name
     run_command(cmd_str)
 
 if 'plot-performance' in args.actions:  # run point estimation on simulation
-    cmd_str = ' --action run-viterbi --plot-performance --seqfile ' + args.simfname + ' --is-simu' + common_args
+    cmd_str = ' run-viterbi --plot-performance --seqfile ' + args.simfname + ' --is-simu' + common_args
     cmd_str += ' --parameter-dir ' + param_dir + '/' + sim_name + '/hmm'
     cmd_str += ' --plotdir ' + args.plotdir + '/' + sim_name + '-performance'
     run_command(cmd_str)
@@ -93,7 +98,7 @@ if 'partition' in args.actions or 'run-viterbi' in args.actions:
     assert len(args.actions) == 1
     action = args.actions[0]
 
-    cmd_str = ' --action ' + action + common_args
+    cmd_str = ' ' + action + common_args
     if not args.is_simu:
         seqfile = args.datafname
         pdir = param_dir + '/data/hmm'

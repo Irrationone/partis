@@ -3,7 +3,10 @@ from subprocess import check_call
 import argparse
 import sys
 import os
-sys.path.insert(1, './python')
+current_script_dir = os.path.dirname(os.path.realpath(__file__)).replace('/bin', '/python')
+if not os.path.exists(current_script_dir):
+    print 'WARNING current script dir %s doesn\'t exist, so python path may not be correctly set' % current_script_dir
+sys.path.insert(1, current_script_dir)
 
 import utils
 import plotting
@@ -12,7 +15,7 @@ raise Exception('needs to be tested since root removal')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--subdirs', default='all', help='Which variable categories?')
-parser.add_argument('--dataset', choices=('adaptive', 'stanford', 'both'), default='adaptive')
+parser.add_argument('--dataset', choices=('adaptive', 'vollmers', 'both'), default='adaptive')
 args = parser.parse_args()
 if args.subdirs == 'all':
     args.subdirs = all_subdirs

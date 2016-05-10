@@ -3,11 +3,15 @@ import csv
 import time
 import sys
 from subprocess import check_output, check_call, Popen
-sys.path.insert(1, './python')
 import random
 from collections import OrderedDict
 import math
 import os
+
+current_script_dir = os.path.dirname(os.path.realpath(__file__)).replace('/bin', '/python')
+if not os.path.exists(current_script_dir):
+    print 'WARNING current script dir %s doesn\'t exist, so python path may not be correctly set' % current_script_dir
+sys.path.insert(1, current_script_dir)
 
 import utils
 import seqfileopener
@@ -52,7 +56,7 @@ def divide_simulation():
 
 # ----------------------------------------------------------------------------------------
 def run_inference(algorithm):
-    base_cmd = './bin/partis.py --action run-' + algorithm + ' --parameter-dir ' + parameter_dir + '/hmm --plot-performance --is-simu --slurm'
+    base_cmd = './bin/partis run-' + algorithm + ' --parameter-dir ' + parameter_dir + '/hmm --plot-performance --is-simu --slurm'
     for n_set in n_set_list:
         # if n_set == 5:
         #     continue
@@ -203,7 +207,7 @@ def fit_stuff(xvals, yvals):
     
 # ----------------------------------------------------------------------------------------
 def simulate():
-    cmd = './bin/partis.py --action simulate --constant-number-of-leaves --n-sim-events 2000 --n-leaves ' + str(n_set_max) + ' --outfname ' + simfname + ' --parameter-dir ' + parameter_dir + '/hmm --n-procs 10'
+    cmd = './bin/partis simulate --constant-number-of-leaves --n-sim-events 2000 --n-leaves ' + str(n_set_max) + ' --outfname ' + simfname + ' --parameter-dir ' + parameter_dir + '/hmm --n-procs 10'
     Popen(cmd.split())
 
 # simulate()
